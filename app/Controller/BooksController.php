@@ -76,4 +76,47 @@ class BooksController extends AppController {
         $this->request->data = $this->Book->findById($id);
     }
 }
+
+public function issue()
+{
+    $this->loadModel('BookIssue');
+    $this->loadModel('Member');
+
+    if ($this->request->is('post')) {
+
+        $this->BookIssue->create();
+
+        if ($this->BookIssue->save($this->request->data)) {
+
+            $this->Session->setFlash(
+                'Book has been issued successfully.'
+            );
+
+            return $this->redirect(array(
+                'controller' => 'Books',
+                'action' => 'index'
+            ));
+        }
+
+        $this->Session->setFlash(
+            'Book could not be issued.'
+        );
+    }
+
+    $members = $this->Member->find('list', array(
+        'fields' => array(
+            'Member.id',
+            'Member.name'
+        )
+    ));
+
+    $books = $this->Book->find('list', array(
+        'fields' => array(
+            'Book.id',
+            'Book.title'
+        )
+    ));
+
+    $this->set(compact('members', 'books'));
+}
 }

@@ -31,10 +31,6 @@
         <td><?php echo h($book['Book']['quantity']); ?></td>
     </tr>
 
-      <tr>
-        <th>Quality</th>
-        <td><?php echo h($book['Book']['quality']); ?></td>
-    </tr>
 </table>
 
 <br>

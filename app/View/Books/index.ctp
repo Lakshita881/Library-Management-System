@@ -87,6 +87,19 @@ echo $this->Html->link(
             );
             ?>
 
+            |
+
+            
+        <?php
+            echo $this->Html->link(
+                'Issue Book',
+                array(
+                    'controller' => 'Books',
+                    'action' => 'issue'
+                )
+            );
+            ?>
+
         </td>
 
     </tr>

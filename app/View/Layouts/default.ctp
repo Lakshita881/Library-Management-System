@@ -21,6 +21,7 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
         echo $this->Html->meta('icon');
 
         echo $this->Html->css('library.generic');
+        echo $this->Html->css('libraryhome.generic'); 
 
         echo $this->fetch('meta');
         echo $this->fetch('css');

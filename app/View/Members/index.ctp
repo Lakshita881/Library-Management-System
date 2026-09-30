@@ -6,14 +6,6 @@
     placeholder="Search members..."
 >
 
-<br><br>
-
-<?php
-echo $this->Html->link(
-    'Add Member',
-    array('action' => 'add')
-);
-?>
 
 <br><br>
 

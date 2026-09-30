@@ -1,22 +1,19 @@
 <?php
 
-class MembersController extends AppController {
-
+class MembersController extends AppController
+{
     public $helpers = array('Html', 'Form');
+    public $uses = array('Member', 'BookIssue');
 
-    public $components = array('Session');
+    public function beforeFilter()
+    {
+        parent::beforeFilter();
 
-
-    public function index() {
-
-        $members = $this->Member->find('all');
-
-        $this->set('members', $members);
+        $this->Auth->allow('register', 'login');
     }
 
-
-    public function add() {
-
+    public function register()
+    {
         if ($this->request->is('post')) {
 
             $this->Member->create();
@@ -24,70 +21,135 @@ class MembersController extends AppController {
             if ($this->Member->save($this->request->data)) {
 
                 $this->Session->setFlash(
-                    'Member has been saved.'
+                    'Registration successful. Please login.'
                 );
 
                 return $this->redirect(
-                    array('action' => 'index')
+                    array('action' => 'login')
                 );
             }
 
             $this->Session->setFlash(
-                'Unable to save the member.'
+                'Registration failed. Please try again.'
             );
         }
     }
 
 
-    public function view($id = null) {
+    public function login()
+    {
+        if ($this->request->is('post')) {
 
-        if (!$id) {
-            throw new NotFoundException('Invalid member');
+            if ($this->Auth->login()) {
+
+                return $this->redirect(
+                    $this->Auth->redirectUrl()
+                );
+            }
+
+            $this->Session->setFlash(
+                'Invalid email or password.'
+            );
+        }
+    }
+
+
+
+
+//     public function login()
+// {
+//     if ($this->request->is('post')) {
+
+//         debug($this->request->data);
+
+//         if ($this->Auth->login()) {
+
+//             debug($this->Auth->user());
+//             die;
+//         }
+
+//         debug('Login failed');
+//         die;
+//     }
+// }
+
+    public function logout()
+    {
+        return $this->redirect(
+            $this->Auth->logout()
+        );
+    }
+
+    public function dashboard(){
+
+    }
+
+    // public function profile(){
+        
+    // }
+
+    public function profile()
+    {
+        $memberId = $this->Auth->user('id');
+
+        if (!$memberId) {
+            return $this->redirect(array(
+                'controller' => 'Members',
+                'action' => 'login'
+            ));
         }
 
-        $member = $this->Member->findById($id);
-
-        if (!$member) {
-            throw new NotFoundException('Member not found');
-        }
+        $member = $this->Member->find('first', array(
+            'conditions' => array(
+                'Member.id' => $memberId
+            )
+        ));
 
         $this->set('member', $member);
     }
 
+//     public function profile()
+// {
+//     debug($this->Auth->user());
+//     die;
+// }
 
-    public function edit($id = null) {
+    public function issuedBooks()
+    {
+        $memberId = $this->Auth->user('id');
 
-        if (!$id) {
-            throw new NotFoundException('Invalid member');
+        if (!$memberId) {
+            return $this->redirect(array(
+                'controller' => 'Members',
+                'action' => 'login'
+            ));
         }
 
-        if (!$this->Member->exists($id)) {
-            throw new NotFoundException('Member not found');
-        }
+        $issues = $this->BookIssue->find('all', array(
+            'conditions' => array(
+                'BookIssue.member_id' => $memberId
+            ),
+            'contain' => array(
+                'Book',
+                'Member'
+            )
+        ));
 
-        if ($this->request->is(array('post', 'put'))) {
-
-            $this->Member->id = $id;
-
-            if ($this->Member->save($this->request->data)) {
-
-                $this->Session->setFlash(
-                    'Member has been updated.'
-                );
-
-                return $this->redirect(
-                    array('action' => 'index')
-                );
-            }
-
-            $this->Session->setFlash(
-                'Unable to update the member.'
-            );
-
-        } else {
-
-            $this->request->data =
-                $this->Member->findById($id);
-        }
+        $this->set('issues', $issues);
     }
+
+    // public function view_books(){
+
+    // }
+
+        public function view_Books()
+    {
+        $this->loadModel('Book');
+
+        $books = $this->Book->find('all');
+
+        $this->set('books', $books);
+    }
+
+
 }
