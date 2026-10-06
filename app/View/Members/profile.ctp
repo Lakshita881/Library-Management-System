@@ -1,6 +1,5 @@
 <div class="profile-page">
 
-```
 <h2>My Profile</h2>
 
 
@@ -44,6 +43,6 @@
     );
     ?>
 </div>
-```
+
 
 </div>

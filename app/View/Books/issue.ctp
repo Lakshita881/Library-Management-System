@@ -8,7 +8,8 @@ echo $this->Form->create('BookIssue');
 echo $this->Form->input('member_id', array(
     'label' => 'Select Member',
     'options' => $members,
-    'empty' => 'Select Member'
+    'empty' => 'Select Member',
+    'required' => true
 ));
 ?>
 
@@ -16,21 +17,24 @@ echo $this->Form->input('member_id', array(
 echo $this->Form->input('book_id', array(
     'label' => 'Select Book',
     'options' => $books,
-    'empty' => 'Select Book'
+    'empty' => 'Select Book',
+    'required' => true
 ));
 ?>
 
 <?php
 echo $this->Form->input('issue_date', array(
     'label' => 'Issue Date',
-    'type' => 'date'
+    'type' => 'date',
+    'required' => true
 ));
 ?>
 
 <?php
 echo $this->Form->input('due_date', array(
     'label' => 'Due Date',
-    'type' => 'date'
+    'type' => 'date',
+    'required' => true
 ));
 ?>
 

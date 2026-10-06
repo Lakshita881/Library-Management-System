@@ -11,6 +11,11 @@ echo $this->Form->input('password', array(
     'label' => 'Password'
 ));
 
+// Define Your Role 
+echo $this->Form->input('role', array(
+    'label' => 'Define Role'
+));
+
 echo $this->Form->end('Login');
 ?>
 

@@ -83,6 +83,8 @@ class BooksController extends AppController {
     }
 }
 
+//Book Issue function 
+
 public function issue()
 {
     $this->loadModel('BookIssue');
