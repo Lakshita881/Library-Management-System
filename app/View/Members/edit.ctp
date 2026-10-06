@@ -1,13 +1,37 @@
 <h2>Edit Member</h2>
 
-<?php echo $this->Form->create('Member'); ?>
+<?php
 
-<?php echo $this->Form->input('name'); ?>
+echo $this->Form->create('Member');
 
-<?php echo $this->Form->input('email'); ?>
+echo $this->Form->input(
+    'name',
+    array(
+        'label' => 'Name'
+    )
+);
 
-<?php echo $this->Form->input('phone'); ?>
+echo $this->Form->input(
+    'email',
+    array(
+        'label' => 'Email'
+    )
+);
 
-<?php echo $this->Form->input('address'); ?>
+echo $this->Form->input(
+    'phone',
+    array(
+        'label' => 'Phone'
+    )
+);
 
-<?php echo $this->Form->end('Update Member'); ?>
+echo $this->Form->input(
+    'address',
+    array(
+        'label' => 'Address'
+    )
+);
+
+echo $this->Form->end('Update Member');
+
+?>

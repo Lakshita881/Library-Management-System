@@ -8,19 +8,9 @@
 
 <br><br>
 
-<?php
-echo $this->Html->link(
-    'Add Member',
-    array('action' => 'add')
-);
-?>
-
-<br><br>
-
 <table id="membersTable" border="1" cellpadding="10">
 
     <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Email</th>
         <th>Phone</th>
@@ -31,10 +21,6 @@ echo $this->Html->link(
     <?php foreach ($members as $member): ?>
 
     <tr>
-
-        <td>
-            <?php echo h($member['Member']['id']); ?>
-        </td>
 
         <td>
             <?php echo h($member['Member']['name']); ?>
@@ -54,11 +40,12 @@ echo $this->Html->link(
 
         <td>
 
+
             <?php
             echo $this->Html->link(
-                'View',
+                'Edit',
                 array(
-                    'action' => 'view',
+                    'action' => 'edit',
                     $member['Member']['id']
                 )
             );
@@ -68,9 +55,10 @@ echo $this->Html->link(
 
             <?php
             echo $this->Html->link(
-                'Edit',
+                'Issue Book',
                 array(
-                    'action' => 'edit',
+                    'controller' => 'books',
+                    'action' => 'issue',
                     $member['Member']['id']
                 )
             );
@@ -84,10 +72,7 @@ echo $this->Html->link(
 
 </table>
 
-</table>
-
 <script>
-
 $(document).ready(function() {
 
     $('#searchMember').keyup(function() {
@@ -109,5 +94,4 @@ $(document).ready(function() {
     });
 
 });
-
 </script>

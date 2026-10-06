@@ -6,6 +6,12 @@ class BooksController extends AppController {
 
     public $components = array('Session');
 
+    public function beforeFilter() {
+    parent::beforeFilter();
+
+    $this->Auth->allow('index', 'view');
+}
+
     public function index() {
 
         $books = $this->Book->find('all');
@@ -76,4 +82,65 @@ class BooksController extends AppController {
         $this->request->data = $this->Book->findById($id);
     }
 }
+
+public function issue()
+{
+    $this->loadModel('BookIssue');
+    $this->loadModel('Member');
+
+    if ($this->request->is('post')) {
+
+        $this->BookIssue->create();
+
+        if ($this->BookIssue->save($this->request->data)) {
+
+            $this->Session->setFlash(
+                'Book has been issued successfully.'
+            );
+
+            return $this->redirect(array(
+                'controller' => 'Books',
+                'action' => 'index'
+            ));
+        }
+
+        $this->Session->setFlash(
+            'Book could not be issued.'
+        );
+    }
+
+    $members = $this->Member->find('list', array(
+        'fields' => array(
+            'Member.id',
+            'Member.name'
+        )
+    ));
+
+    $books = $this->Book->find('list', array(
+        'fields' => array(
+            'Book.id',
+            'Book.title'
+        )
+    ));
+
+    $this->set(compact('members', 'books'));
+}
+
+            public function librarylogin()
+        {
+            if ($this->request->is('post')) {
+
+                if ($this->Auth->login()) {
+
+                    return $this->redirect(array(
+                        'controller' => 'Books',
+                        'action' => 'index'
+                    ));
+                }
+
+                $this->Session->setFlash(
+                    'Invalid email or password.'
+                );
+            }
+        }
 }

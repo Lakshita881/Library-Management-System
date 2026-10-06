@@ -30,6 +30,7 @@
         <th>Quantity</th>
         <td><?php echo h($book['Book']['quantity']); ?></td>
     </tr>
+
 </table>
 
 <br>
