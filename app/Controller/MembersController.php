@@ -9,69 +9,141 @@ class MembersController extends AppController
     {
         parent::beforeFilter();
 
-        $this->Auth->allow('register', 'login');
+        $this->Auth->allow('register', 'login' , 'ViewBooks');
     }
 
-    public function register()
+    // public function register()
+    // {
+    //     if ($this->request->is('post')) {
+
+    //         $this->Member->create();
+
+    //         if ($this->Member->save($this->request->data)) {
+
+    //             $this->Session->setFlash(
+    //                 'Registration successful. Please login.'
+    //             );
+
+    //             return $this->redirect(
+    //                 array('action' => 'login')
+    //             );
+    //         }
+
+    //         $this->Session->setFlash(
+    //             'Registration failed. Please try again.'
+    //         );
+    //     }
+    // }
+
+
+
+        public function register()
     {
         if ($this->request->is('post')) {
 
-            $this->Member->create();
+            $email = $this->request->data['Member']['email'];
 
-            if ($this->Member->save($this->request->data)) {
+            // Check if email already exists
+            $existingMember = $this->Member->find('first', array(
+                'conditions' => array(
+                    'Member.email' => $email
+                )
+            ));
+
+            if ($existingMember) {
 
                 $this->Session->setFlash(
-                    'Registration successful. Please login.'
+                    'Email is already registered. Please use another email.',
+                    'default',
+                    array(),
+                    'auth'
                 );
 
-                return $this->redirect(
-                    array('action' => 'login')
-                );
+            } else {
+
+                $this->Member->create();
+
+                if ($this->Member->save($this->request->data)) {
+
+                    $this->Session->setFlash(
+                        'Registration successful. Please login.'
+                    );
+
+                    return $this->redirect(array(
+                        'action' => 'login'
+                    ));
+                }
             }
-
-            $this->Session->setFlash(
-                'Registration failed. Please try again.'
-            );
         }
     }
 
+        //     public function login()
+        // {
+        //     if ($this->request->is('post')) {
 
-    public function login()
-    {
-        if ($this->request->is('post')) {
+        //         if ($this->Auth->login()) {
 
-            if ($this->Auth->login()) {
+        //             return $this->redirect(array(
+        //                 'controller' => 'Members',
+        //                 'action' => 'dashboard'
+        //             ));
+        //         }
 
-                return $this->redirect(
-                    $this->Auth->redirectUrl()
-                );
-            }
-
-            $this->Session->setFlash(
-                'Invalid email or password.'
-            );
-        }
-    }
-
-
+        //         $this->Session->setFlash(
+        //             'Invalid email or password.'
+        //         );
+        //     }
+        // }
 
 
-//     public function login()
-// {
-//     if ($this->request->is('post')) {
+    // public function login()
+    // {
+    //     if ($this->request->is('post')) {
 
-//         debug($this->request->data);
+    //         debug($this->request->data);
 
-//         if ($this->Auth->login()) {
+    //         if ($this->Auth->login()) {
 
-//             debug($this->Auth->user());
-//             die;
-//         }
+    //             debug($this->Auth->user());
+    //             exit;
 
-//         debug('Login failed');
-//         die;
-//     }
-// }
+    //         } else {
+
+    //             debug('AUTH LOGIN FAILED');
+    //             exit;
+    //         }
+    //     }
+    // }
+        // public function login()
+        // {
+        //     if ($this->request->is('post')) {
+
+        //         debug($this->request->data);
+
+        //         $member = $this->Member->find('first', array(
+        //             'conditions' => array(
+        //                 'Member.email' => $this->request->data['Member']['email'],
+        //                 'Member.password' => AuthComponent::password(
+        //                     $this->request->data['Member']['password']
+        //                 )
+        //             )
+        //         ));
+
+        //         debug($member);
+
+        //         if ($this->Auth->login()) {
+
+        //             debug($this->Auth->user());
+        //             exit;
+
+        //         } else {
+
+        //             debug('AUTH LOGIN FAILED');
+        //             exit;
+        //         }
+        //     }
+        // }
+
 
     public function logout()
     {
@@ -114,6 +186,26 @@ class MembersController extends AppController
 //     die;
 // }
 
+
+        public function login()
+        {
+            if ($this->request->is('post')) {
+
+                if ($this->Auth->login()) {
+
+                    return $this->redirect(array(
+                        'controller' => 'Members',
+                        'action' => 'dashboard'
+                    ));
+                }
+
+                $this->Session->setFlash(
+                    'Invalid email or password.'
+                );
+            }
+        }
+
+
     public function issuedBooks()
     {
         $memberId = $this->Auth->user('id');
@@ -142,7 +234,7 @@ class MembersController extends AppController
 
     // }
 
-        public function view_Books()
+        public function ViewBooks()
     {
         $this->loadModel('Book');
 
@@ -150,6 +242,114 @@ class MembersController extends AppController
 
         $this->set('books', $books);
     }
+
+
+        public function add()
+    {
+        if ($this->request->is('post')) {
+
+            $this->Member->create();
+
+            if ($this->Member->save($this->request->data)) {
+
+                $this->Session->setFlash(
+                    'Member added successfully.'
+                );
+
+                return $this->redirect(
+                    array(
+                        'controller' => 'librarians',
+                        'action' => 'dashboard'
+                    )
+                );
+            }
+
+            $this->Session->setFlash(
+                'Unable to add member.'
+            );
+        }
+    }
+    // public function index()
+    // {
+    //     $members = $this->Member->find(
+    //         'all',
+    //         array(
+    //             'fields' => array(
+    //                 'Member.name',
+    //                 'Member.email',
+    //                 'Member.phone',
+    //                 'Member.address'
+    //             )
+    //         )
+    //     );
+
+    //     $this->set('members', $members);
+    // }
+
+    public function index()
+{
+    $members = $this->Member->find(
+        'all',
+        array(
+            'fields' => array(
+                'Member.id',
+                'Member.name',
+                'Member.email',
+                'Member.phone',
+                'Member.address'
+            )
+        )
+    );
+
+    $this->set('members', $members);
+}
+
+public function edit($id = null)
+{
+    if (!$id) {
+        throw new NotFoundException('Invalid member');
+    }
+
+    $member = $this->Member->findById($id);
+
+    if (!$member) {
+        throw new NotFoundException('Member not found');
+    }
+
+    if ($this->request->is(array('post', 'put'))) {
+
+        $this->Member->id = $id;
+
+        $data = array(
+            'name' => $this->request->data['Member']['name'],
+            'email' => $this->request->data['Member']['email'],
+            'phone' => $this->request->data['Member']['phone'],
+            'address' => $this->request->data['Member']['address']
+        );
+
+        if ($this->Member->save($data)) {
+
+            $this->Session->setFlash(
+                'Member details updated successfully.'
+            );
+
+            return $this->redirect(
+                array(
+                    'action' => 'index'
+                )
+            );
+        }
+
+        $this->Session->setFlash(
+            'Unable to update member.'
+        );
+
+    } else {
+
+        $this->request->data = $member;
+    }
+}
+
 
 
 }

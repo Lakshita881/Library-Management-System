@@ -52,7 +52,7 @@
                     'Explore Books',
                     array(
                         'controller' => 'members',
-                        'action' => 'view_books'
+                        'action' => 'ViewBooks'
                     ),
                     array('class' => 'primary-btn')
                 );
@@ -117,7 +117,7 @@
                     'View Books →',
                     array(
                         'controller' => 'members',
-                        'action' => 'view_books'
+                        'action' => 'ViewBooks'
                     )
                 );
                 ?>

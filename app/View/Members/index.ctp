@@ -6,13 +6,11 @@
     placeholder="Search members..."
 >
 
-
 <br><br>
 
 <table id="membersTable" border="1" cellpadding="10">
 
     <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Email</th>
         <th>Phone</th>
@@ -23,10 +21,6 @@
     <?php foreach ($members as $member): ?>
 
     <tr>
-
-        <td>
-            <?php echo h($member['Member']['id']); ?>
-        </td>
 
         <td>
             <?php echo h($member['Member']['name']); ?>
@@ -46,11 +40,12 @@
 
         <td>
 
+
             <?php
             echo $this->Html->link(
-                'View',
+                'Edit',
                 array(
-                    'action' => 'view',
+                    'action' => 'edit',
                     $member['Member']['id']
                 )
             );
@@ -60,9 +55,10 @@
 
             <?php
             echo $this->Html->link(
-                'Edit',
+                'Issue Book',
                 array(
-                    'action' => 'edit',
+                    'controller' => 'books',
+                    'action' => 'issue',
                     $member['Member']['id']
                 )
             );
@@ -76,10 +72,7 @@
 
 </table>
 
-</table>
-
 <script>
-
 $(document).ready(function() {
 
     $('#searchMember').keyup(function() {
@@ -101,5 +94,4 @@ $(document).ready(function() {
     });
 
 });
-
 </script>

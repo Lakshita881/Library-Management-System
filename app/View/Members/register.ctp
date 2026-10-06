@@ -1,5 +1,7 @@
 <h2>Member Registration</h2>
 
+<?php echo $this->Session->flash('auth'); ?>
+
 <?php
 echo $this->Form->create('Member');
 ?>

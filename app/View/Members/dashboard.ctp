@@ -18,7 +18,7 @@
                     'Browse Books',
                     array(
                         'controller' => 'members',
-                        'action' => 'view_books'
+                        'action' => 'ViewBooks'
                     )
                 );
                 ?>

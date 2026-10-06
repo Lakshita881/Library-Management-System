@@ -1,4 +1,4 @@
-<h2>Register Your Self</h2>
+<h2>Add Member</h2>
 
 <?php echo $this->Form->create('Member'); ?>
 
