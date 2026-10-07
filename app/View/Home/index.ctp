@@ -13,10 +13,10 @@
                 array('controller' => 'home', 'action' => 'index')
             );
 
-            echo $this->Html->link(
-                'Books',
-                array('controller' => 'books', 'action' => 'index')
-            );
+            // echo $this->Html->link(
+            //     'Books',
+            //     array('controller' => 'books', 'action' => 'index')
+            // );
 
             echo $this->Html->link(
                 'Login',

@@ -1,4 +1,4 @@
-<h2>Member Login</h2>
+<h2>Login</h2>
 
 <?php
 echo $this->Form->create('Member');
@@ -13,7 +13,7 @@ echo $this->Form->input('password', array(
 
 // Define Your Role 
 echo $this->Form->input('role', array(
-    'label' => 'Define Role'
+    'label' => 'Role'
 ));
 
 echo $this->Form->end('Login');

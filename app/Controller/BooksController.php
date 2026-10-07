@@ -9,7 +9,7 @@ class BooksController extends AppController {
     public function beforeFilter() {
     parent::beforeFilter();
 
-    $this->Auth->allow('index', 'view');
+    $this->Auth->allow('index', 'view' , 'add');
 }
 
     public function index() {
@@ -35,32 +35,43 @@ class BooksController extends AppController {
         }
     }
 
-    public function view($id = null) {
-        if (!$id) {
-            throw new NotFoundException('Invalid book');
-        }
+    // // public function view($id = null) {
+    // //     if (!$id) {
+    // //         throw new NotFoundException('Invalid book');
+    // //     }
 
-        $book = $this->Book->findById($id);
+    // //     $book = $this->Book->findById($id);
 
-        if (!$book) {
-            throw new NotFoundException('Book not found');
-        }
+    // //     if (!$book) {
+    // //         throw new NotFoundException('Book not found');
+    // //     }
 
-        $this->set('book', $book);
-    }
 
-    // public function edit(){
-
+    //     $this->set('book', $book);
     // }
+
+        public function view($id = null)
+        {
+            $book = $this->Book->findById($id);
+
+            if (!$book) {
+                throw new NotFoundException('Book not found');
+            }
+
+            $this->set('book', $book);
+        }
 
 
     public function edit($id = null) {
 
-    if (!$id) {
-        throw new NotFoundException('Invalid book');
-    }
+    // if (!$id) {
+    //     throw new NotFoundException('Invalid book');
+    // }
 
-    if (!$this->Book->exists($id)) {
+    // if (!$this->Book->exists($id)) {
+    //     throw new NotFoundException('Book not found');
+    // }
+        if (!$this->Book->exists($id)) {
         throw new NotFoundException('Book not found');
     }
 
@@ -85,48 +96,49 @@ class BooksController extends AppController {
 
 //Book Issue function 
 
-public function issue()
-{
-    $this->loadModel('BookIssue');
-    $this->loadModel('Member');
+        public function issue()
+        {
+            $this->loadModel('BookIssue');
+            $this->loadModel('Member');
 
-    if ($this->request->is('post')) {
+            if ($this->request->is('post')) {
 
-        $this->BookIssue->create();
+                $this->BookIssue->create();
 
-        if ($this->BookIssue->save($this->request->data)) {
+                if ($this->BookIssue->save($this->request->data)) {
 
-            $this->Session->setFlash(
-                'Book has been issued successfully.'
-            );
+                    $this->Session->setFlash(
+                        'Book has been issued successfully.'
+                    );
 
-            return $this->redirect(array(
-                'controller' => 'Books',
-                'action' => 'index'
+                    return $this->redirect(array(
+                        'controller' => 'Books',
+                        'action' => 'index'
+                    ));
+                }
+
+                $this->Session->setFlash(
+                    'Book could not be issued.'
+                );
+            }
+
+            $members = $this->Member->find('list', array(
+                'fields' => array(
+                    'Member.id',
+                    'Member.name'
+                )
             ));
+
+            $books = $this->Book->find('list', array(
+                'fields' => array(
+                    'Book.id',
+                    'Book.title'
+                )
+            ));
+
+            $this->set(compact('members', 'books'));
         }
 
-        $this->Session->setFlash(
-            'Book could not be issued.'
-        );
-    }
-
-    $members = $this->Member->find('list', array(
-        'fields' => array(
-            'Member.id',
-            'Member.name'
-        )
-    ));
-
-    $books = $this->Book->find('list', array(
-        'fields' => array(
-            'Book.id',
-            'Book.title'
-        )
-    ));
-
-    $this->set(compact('members', 'books'));
-}
 
             public function librarylogin()
         {

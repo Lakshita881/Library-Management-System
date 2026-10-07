@@ -1,4 +1,17 @@
-<h2>Book Details</h2>
+<h2>Book Details</h2> 
+
+<h3><?php
+echo $this->Html->link(
+    'Edit Book',
+    array(
+        'action' => 'edit',
+        $book['Book']['id']
+    ),
+    array(
+        'class' => 'btn btn-primary'
+    )
+);
+?> </h3>
 
 <table border="1" cellpadding="10">
     <tr>
@@ -33,7 +46,7 @@
 
 </table>
 
-<br>
+<br> 
 
 <?php
 echo $this->Html->link(

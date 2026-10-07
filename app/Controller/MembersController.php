@@ -13,47 +13,172 @@
             }
 
 
+            //New Changed Register function
+        // public function register()
+        // {
+        //     if ($this->request->is('post')) {
+        //         $name = trim($this->request->data['Member']['name']);
+        //         $email = trim($this->request->data['Member']['email']);
+        //         $password = trim($this->request->data['Member']['password']);
+        //         $phone = trim($this->request->data['Member']['phone']);
+        //         $address = trim($this->request->data['Member']['address']);
+
+        //         // Check email
+        //         if (empty($email)) {
+
+        //             $this->Session->setFlash(
+        //                 'Email is required.'
+        //             );
+
+        //             return;
+        //         }
+
+        //         // Check password
+        //         if (empty($password)) {
+
+        //             $this->Session->setFlash(
+        //                 'Password is required.'
+        //             );
+
+        //             return;
+        //         }
+
+        //         // Check duplicate email
+        //         $existingMember = $this->Member->find('first', array(
+        //             'conditions' => array(
+        //                 'Member.email' => $email
+        //             )
+        //         ));
+
+        //         if ($existingMember) {
+
+        //             $this->Session->setFlash(
+        //                 'Email is already registered. Please use another email.'
+        //             );
+
+        //             return;
+        //         }
+
+        //         // Check duplicate phone 
+        //         $existingMember = $this->Member->find('first', array(
+        //             'conditions' => array(
+        //                 'Member.phone' => $phone
+        //             )
+        //         ));
+
+        //         if ($existingMember) {
+
+        //             $this->Session->setFlash(
+        //                 'Phone No Already Registered'
+        //             );
+
+        //             return;
+        //         }
+
+        //         // Create new member
+        //         $this->Member->create();
+
+        //         if ($this->Member->save($this->request->data)) {
+
+        //             $this->Session->setFlash(
+        //                 'Registration successful. Please login.'
+        //             );
+
+        //             return $this->redirect(array(
+        //                 'action' => 'login'
+        //             ));
+
+        //         } else {
+
+        //             $this->Session->setFlash(
+        //                 'Please fill valid details.'
+        //             );
+        //         }
+        //     }
+        // }
+public function register()
+{
+    if ($this->request->is('post')) {
+
+        // Remove starting and ending spaces
+        $this->request->data['Member']['name'] =
+            trim($this->request->data['Member']['name']);
+
+        $this->request->data['Member']['email'] =
+            trim($this->request->data['Member']['email']);
+
+        $this->request->data['Member']['password'] =
+            trim($this->request->data['Member']['password']);
+
+        $this->request->data['Member']['phone'] =
+            trim($this->request->data['Member']['phone']);
+
+        $this->request->data['Member']['address'] =
+            trim($this->request->data['Member']['address']);
 
 
-                public function register()
-            {
-                if ($this->request->is('post')) {
+        // Get trimmed values
+        $email = $this->request->data['Member']['email'];
+        $phone = $this->request->data['Member']['phone'];
 
-                    $email = $this->request->data['Member']['email'];
 
-                    // Check if email already exists
-                    $existingMember = $this->Member->find('first', array(
-                        'conditions' => array(
-                            'Member.email' => $email
-                        )
-                    ));
+        // Check if email already exists
+        $existingMember = $this->Member->find('first', array(
+            'conditions' => array(
+                'Member.email' => $email
+            )
+        ));
 
-                    if ($existingMember) {
+        if ($existingMember) {
 
-                        $this->Session->setFlash(
-                            'Email is already registered. Please use another email.',
-                            'default',
-                            array(),
-                            'auth'
-                        );
+            $this->Session->setFlash(
+                'Email is already registered. Please use another email.'
+            );
 
-                    } else {
+            return;
+        }
 
-                        $this->Member->create();
 
-                        if ($this->Member->save($this->request->data)) {
+        // Check if phone already exists
+        $existingMember = $this->Member->find('first', array(
+            'conditions' => array(
+                'Member.phone' => $phone
+            )
+        ));
 
-                            $this->Session->setFlash(
-                                'Registration successful. Please login.'
-                            );
+        if ($existingMember) {
 
-                            return $this->redirect(array(
-                                'action' => 'login'
-                            ));
-                        }
-                    }
-                }
-            }
+            $this->Session->setFlash(
+                'Phone number is already registered.'
+            );
+
+            return;
+        }
+
+
+        // Create new member
+        $this->Member->create();
+
+
+        // Save member
+        if ($this->Member->save($this->request->data)) {
+
+            $this->Session->setFlash(
+                'Registration successful. Please login.'
+            );
+
+            return $this->redirect(array(
+                'action' => 'login'
+            ));
+
+        } else {
+
+            $this->Session->setFlash(
+                'Please enter correct details.'
+            );
+        }
+    }
+}
 
 
             public function logout()
@@ -172,14 +297,17 @@
 
         public function edit($id = null)
         {
-            if (!$id) {
-                throw new NotFoundException('Invalid member');
-            }
+            // if (!$id) {
+            //     throw new NotFoundException('Invalid member');
+            // }
 
-            $member = $this->Member->findById($id);
+            // $member = $this->Member->findById($id);
 
-            if (!$member) {
-                throw new NotFoundException('Member not found');
+            // if (!$member) {
+            //     throw new NotFoundException('Member not found');
+            // }
+            if (!$id || !($member = $this->Member->findById($id))) {
+                    throw new NotFoundException('Invalid or missing member');
             }
 
             if ($this->request->is(array('post', 'put'))) {

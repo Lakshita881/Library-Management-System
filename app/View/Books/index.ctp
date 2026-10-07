@@ -7,14 +7,18 @@
 >
 <br><br>
 <table >
+  
 <tr>
 <th>
-<?php
-echo $this->Html->link(
-    'Add Book',
-    array('action' => 'add')
-);
-?>
+                    <?php
+            echo $this->Html->link(
+                'Add Book ',
+                array(
+                    'action' => 'add',
+                 
+                )
+            );
+            ?>
 </th>
 <th>
 <!-- <br><br> -->
@@ -36,6 +40,7 @@ echo $this->Html->link(
     </tr>
 
     <?php foreach ($books as $book): ?>
+
 
     <tr>
 
@@ -75,9 +80,9 @@ echo $this->Html->link(
             );
             ?>
 
-            |
+            <!-- | -->
 
-            <?php
+            <!-- <?php
             echo $this->Html->link(
                 'Edit',
                 array(
@@ -85,7 +90,7 @@ echo $this->Html->link(
                     $book['Book']['id']
                 )
             );
-            ?>
+            ?> -->
 
             |
 

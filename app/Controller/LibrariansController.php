@@ -66,39 +66,39 @@ class LibrariansController extends AppController
 
 
 
-    public function createStaticLibrarians()
-{
-    $librarians = array(
-        array(
-            'name' => 'Librarian One',
-            'email' => 'librarian1@gmail.com',
-            'password' => 'library123'
-        ),
-        array(
-            'name' => 'Librarian Two',
-            'email' => 'librarian2@gmail.com',
-            'password' => 'library456'
-        ),
-        array(
-            'name' => 'Librarian Three',
-            'email' => 'librarian3@gmail.com',
-            'password' => 'library789'
-        )
-    );
+//     public function createStaticLibrarians()
+// {
+//     $librarians = array(
+//         array(
+//             'name' => 'Librarian One',
+//             'email' => 'librarian1@gmail.com',
+//             'password' => 'library123'
+//         ),
+//         array(
+//             'name' => 'Librarian Two',
+//             'email' => 'librarian2@gmail.com',
+//             'password' => 'library456'
+//         ),
+//         array(
+//             'name' => 'Librarian Three',
+//             'email' => 'librarian3@gmail.com',
+//             'password' => 'library789'
+//         )
+//     );
 
-    foreach ($librarians as $data) {
+//     foreach ($librarians as $data) {
 
-        $this->Librarian->create();
+//         $this->Librarian->create();
 
-        if ($this->Librarian->save($data)) {
-            echo $data['email'] . ' created successfully.<br>';
-        } else {
-            echo $data['email'] . ' failed.<br>';
-        }
-    }
+//         if ($this->Librarian->save($data)) {
+//             echo $data['email'] . ' created successfully.<br>';
+//         } else {
+//             echo $data['email'] . ' failed.<br>';
+//         }
+//     }
 
-    exit;
-}
+//     exit;
+// }
 
     public function dashboard()
     {
@@ -110,8 +110,8 @@ class LibrariansController extends AppController
 
         return $this->redirect(
             array(
-                'controller' => 'librarians',
-                'action' => 'login'
+                'controller' => 'home',
+                'action' => 'index'
             )
         );
     }

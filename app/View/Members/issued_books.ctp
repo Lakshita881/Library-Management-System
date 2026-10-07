@@ -10,7 +10,7 @@
         <th>Issue Date</th>
         <th>Due Date</th>
         <th>Status</th>
-        <th>Fine</th>
+        <!-- <th>Fine</th> -->
     </tr>
 
     <?php foreach ($issues as $issue): ?>
@@ -37,9 +37,7 @@
                 <?php echo h($issue['BookIssue']['status']); ?>
             </td>
 
-            <td>
-                ₹<?php echo h($issue['BookIssue']['fine']); ?>
-            </td>
+
 
         </tr>
 
