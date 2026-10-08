@@ -157,4 +157,32 @@ class BooksController extends AppController {
                 );
             }
         }
+
+        public function delete($id = null) {
+
+            if (!$id) {
+                throw new NotFoundException('Invalid book');
+            }
+
+            if (!$this->Book->exists($id)) {
+                throw new NotFoundException('Book not found');
+            }
+
+            if ($this->Book->delete($id)) {
+
+                $this->Session->setFlash(
+                    'Book has been deleted.'
+                );
+
+            } else {
+
+                $this->Session->setFlash(
+                    'Unable to delete the book.'
+                );
+            }
+
+            return $this->redirect(array(
+                'action' => 'index'
+            ));
+        }
 }

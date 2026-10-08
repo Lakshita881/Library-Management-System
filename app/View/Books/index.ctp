@@ -80,7 +80,19 @@
             );
             ?>
 
-            <!-- | -->
+            |
+             <?php
+                echo $this->Html->link(
+                    'Delete',
+                    array(
+                        'action' => 'delete',
+                        $book['Book']['id']
+                    ),
+                    array(
+                        'confirm' => 'Are you sure you want to delete this book?'
+                    )
+                );
+                ?>
 
             <!-- <?php
             echo $this->Html->link(

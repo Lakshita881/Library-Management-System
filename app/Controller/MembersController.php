@@ -346,74 +346,135 @@ public function register()
 
         // new merged login 
 
+        // public function login()
+        // {
+        //     if ($this->request->is('post')) {
+
+        //         // First check email and password
+        //         if ($this->Auth->login()) {
+
+        //             // Get the actual logged-in user from database
+        //             $user = $this->Auth->user();
+
+        //             // Get role entered in login form
+        //             $enteredRole = $this->request->data['Member']['role'];
+
+        //             // Compare entered role with database role
+        //             if ($enteredRole !== $user['role']) {
+
+        //                 // Wrong role
+        //                 $this->Auth->logout();
+
+        //                 $this->Session->setFlash(
+        //                     'Invalid role defined.'
+        //                 );
+
+        //                 return $this->redirect(array(
+        //                     'controller' => 'members',
+        //                     'action' => 'login'
+        //                 ));
+        //             }
+
+        //             // Correct role
+        //             if ($user['role'] === 'librarian') {
+
+        //                 return $this->redirect(array(
+        //                     'controller' => 'librarians',
+        //                     'action' => 'dashboard'
+        //                 ));
+
+        //             } elseif ($user['role'] === 'member') {
+
+        //                 return $this->redirect(array(
+        //                     'controller' => 'members',
+        //                     'action' => 'dashboard'
+        //                 ));
+
+        //             } else {
+
+        //                 // Unknown role
+        //                 $this->Auth->logout();
+
+        //                 $this->Session->setFlash(
+        //                     'Invalid role defined.'
+        //                 );
+
+        //                 return $this->redirect(array(
+        //                     'controller' => 'members',
+        //                     'action' => 'login'
+        //                 ));
+        //             }
+
+        //         } else {
+
+        //             // Email or password incorrect
+        //             $this->Session->setFlash(
+        //                 'Invalid email or password.'
+        //             );
+        //         }
+        //     }
+        // }
+
+
         public function login()
         {
             if ($this->request->is('post')) {
 
-                // First check email and password
+                // Get email entered by user
+                $email = trim($this->request->data['Member']['email']);
+
+                // Check whether email exists in members table
+                $member = $this->Member->find('first', array(
+                    'conditions' => array(
+                        'Member.email' => $email
+                    )
+                ));
+
+                // Email does not exist
+                if (!$member) {
+
+                    $this->Session->setFlash(
+                        'Email is not registered.'
+                    );
+
+                    return;
+                }
+
+                // Check email and password using CakePHP Auth
                 if ($this->Auth->login()) {
 
-                    // Get the actual logged-in user from database
-                    $user = $this->Auth->user();
+                    // Get logged-in member data
+                    $loggedInMember = $this->Auth->user();
 
-                    // Get role entered in login form
-                    $enteredRole = $this->request->data['Member']['role'];
+                    // Check role from members table
+                    if ($loggedInMember['role'] == 'librarian') {
 
-                    // Compare entered role with database role
-                    if ($enteredRole !== $user['role']) {
-
-                        // Wrong role
-                        $this->Auth->logout();
-
-                        $this->Session->setFlash(
-                            'Invalid role defined.'
-                        );
-
-                        return $this->redirect(array(
-                            'controller' => 'members',
-                            'action' => 'login'
-                        ));
-                    }
-
-                    // Correct role
-                    if ($user['role'] === 'librarian') {
-
+                        // Librarian → Librarian Dashboard
                         return $this->redirect(array(
                             'controller' => 'librarians',
                             'action' => 'dashboard'
                         ));
 
-                    } elseif ($user['role'] === 'member') {
+                    } else {
 
+                        // Normal Member → Member Dashboard
                         return $this->redirect(array(
                             'controller' => 'members',
                             'action' => 'dashboard'
-                        ));
-
-                    } else {
-
-                        // Unknown role
-                        $this->Auth->logout();
-
-                        $this->Session->setFlash(
-                            'Invalid role defined.'
-                        );
-
-                        return $this->redirect(array(
-                            'controller' => 'members',
-                            'action' => 'login'
                         ));
                     }
 
                 } else {
 
-                    // Email or password incorrect
+                    // Wrong password
                     $this->Session->setFlash(
                         'Invalid email or password.'
                     );
                 }
             }
         }
+
+
 
 
 
