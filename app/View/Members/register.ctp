@@ -1,12 +1,24 @@
 <h2>Member Registration</h2>
 
-<?php echo $this->Session->flash('auth'); ?>
+<!-- <?php echo $this->Session->flash('auth'); ?> -->
+ <?php echo $this->Session->flash(); ?>
 
-<?php
+<!-- <?php
 echo $this->Form->create('Member', array(
     'novalidate' => true,
     'onsubmit' => 'return validateRegisterForm();'
 ));
+?> -->
+<?php
+echo $this->Form->create('Member', array(
+    'url' => array(
+        'controller' => 'members',
+        'action' => 'register'
+    ),
+    'novalidate' => true,
+    'onsubmit' => 'return validateRegisterForm();'
+));
+
 ?>
 
 <?php

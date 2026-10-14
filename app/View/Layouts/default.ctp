@@ -60,5 +60,15 @@ $cakeVersion = __d('cake_dev', 'CakePHP %s', Configure::version())
 
     <?php echo $this->fetch('script'); ?>
 
+
+    <script>
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+    </script>
+
+
 </body>
 </html>

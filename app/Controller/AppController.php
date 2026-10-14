@@ -31,7 +31,9 @@ class AppController extends Controller
             'logoutRedirect' => array(
                 'controller' => 'home',
                 'action' => 'index'
-            )
+            ),
+
+            'authError' => 'Please login to access this page.'
         )
     );
 
@@ -39,5 +41,20 @@ class AppController extends Controller
     {
         parent::beforeFilter();
     }
-}
 
+    public function beforeRender()
+    {
+        parent::beforeRender();
+
+        $this->response->header(
+            'Cache-Control',
+            'no-store, no-cache, must-revalidate, max-age=0'
+        );
+
+        $this->response->header('Pragma', 'no-cache');
+        $this->response->header('Expires', '0');
+    }
+
+
+
+}

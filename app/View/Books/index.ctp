@@ -94,6 +94,7 @@
                 );
                 ?>
 
+                
             <!-- <?php
             echo $this->Html->link(
                 'Edit',
@@ -107,7 +108,7 @@
             |
 
             
-        <?php
+        <!-- <?php
             echo $this->Html->link(
                 'Issue Book',
                 array(
@@ -115,7 +116,32 @@
                     'action' => 'issue'
                 )
             );
+            ?> -->
+
+
+
+        <?php if ((int)$book['Book']['quantity'] > 0): ?>
+
+            <?php
+            echo $this->Html->link(
+                'Issue Book',
+                array(
+                    'controller' => 'Books',
+                    'action' => 'issue',
+                    $book['Book']['id']
+                ),
+                array('class' => 'issue-button')
+            );
             ?>
+
+        <?php else: ?>
+
+            <span class="issue-disabled">Out of Stock</span>
+
+        <?php endif; ?>
+
+
+
 
         </td>
 

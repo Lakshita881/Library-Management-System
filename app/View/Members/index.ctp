@@ -9,7 +9,6 @@
 <br><br>
 
 <table id="membersTable" border="1" cellpadding="10">
-
     <tr>
         <th>Name</th>
         <th>Email</th>
@@ -19,9 +18,7 @@
     </tr>
 
     <?php foreach ($members as $member): ?>
-
     <tr>
-
         <td>
             <?php echo h($member['Member']['name']); ?>
         </td>
@@ -39,8 +36,6 @@
         </td>
 
         <td>
-
-
             <?php
             echo $this->Html->link(
                 'Edit',
@@ -55,32 +50,27 @@
 
             <?php
             echo $this->Html->link(
-                'Issue Book',
+                'Books Issued',
                 array(
-                    'controller' => 'books',
-                    'action' => 'issue',
+                    'action' => 'issuedBooks',
                     $member['Member']['id']
+                ),
+                array(
+                    'class' => 'books-issued-button'
                 )
             );
             ?>
-
         </td>
-
     </tr>
-
     <?php endforeach; ?>
-
 </table>
 
 <script>
 $(document).ready(function() {
-
     $('#searchMember').keyup(function() {
-
         var search = $(this).val().toLowerCase();
 
         $('#membersTable tr:gt(0)').each(function() {
-
             var rowText = $(this).text().toLowerCase();
 
             if (rowText.indexOf(search) > -1) {
@@ -88,10 +78,7 @@ $(document).ready(function() {
             } else {
                 $(this).hide();
             }
-
         });
-
     });
-
 });
 </script>

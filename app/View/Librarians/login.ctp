@@ -1,7 +1,7 @@
-<h2>Librarian Login</h2>
+<h2>Login</h2>
 
 <?php
-echo $this->Form->create('Librarian');
+echo $this->Form->create('Member');
 
 echo $this->Form->input(
     'email',
