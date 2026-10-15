@@ -26,7 +26,8 @@ public function beforeFilter()
         'edit',
         'issue',
         'delete',
-        'index'
+        'index',
+        'view'
     );
 
     if (in_array($this->request->params['action'], $restrictedActions)) {
@@ -722,6 +723,152 @@ public function edit($id = null)
 
 
 
+// public function issue($bookId = null)
+// {
+//     $this->loadModel('Book');
+//     $this->loadModel('Member');
+//     $this->loadModel('BookIssue');
+
+//     // Validate book ID.
+//     if (
+//         $bookId === null ||
+//         !ctype_digit((string)$bookId) ||
+//         (int)$bookId <= 0 ||
+//         !$this->Book->exists((int)$bookId)
+//     ) {
+//         throw new NotFoundException('Invalid or missing book');
+//     }
+
+//     $bookId = (int)$bookId;
+
+//     $today = date('Y-m-d');
+//     $issueDate = $today;
+//     $dueDate = date('Y-m-d', strtotime('+15 days', strtotime($today)));
+
+//     if ($this->request->is(array('post', 'put'))) {
+
+//         $data = isset($this->request->data['BookIssue'])
+//             ? $this->request->data['BookIssue']
+//             : array();
+
+//         $memberId = isset($data['member_id'])
+//             ? $data['member_id']
+//             : '';
+
+//         // Validate member.
+//         if (
+//             !ctype_digit((string)$memberId) ||
+//             (int)$memberId <= 0 ||
+//             !$this->Member->exists((int)$memberId)
+//         ) {
+//             $this->Session->setFlash('Please select a valid member.');
+//         } else {
+
+//             // Check current book quantity.
+//             $book = $this->Book->find('first', array(
+//                 'conditions' => array('Book.id' => $bookId),
+//                 'fields' => array(
+//                     'Book.id',
+//                     'Book.title',
+//                     'Book.quantity'
+//                 ),
+//                 'recursive' => -1
+//             ));
+
+//             if (
+//                 empty($book) ||
+//                 (int)$book['Book']['quantity'] <= 0
+//             ) {
+//                 $this->Session->setFlash(
+//                     'This book is out of stock and cannot be issued.'
+//                 );
+//             } else {
+
+//                 $db = $this->Book->getDataSource();
+//                 $db->begin();
+
+//                 // Decrease stock by exactly one, only if stock remains.
+//                 $updated = $this->Book->updateAll(
+//                     array(
+//                         'Book.quantity' => 'Book.quantity - 1'
+//                     ),
+//                     array(
+//                         'Book.id' => $bookId,
+//                         'Book.quantity >' => 0
+//                     )
+//                 );
+
+//                 $affectedRows = $db->lastAffected();
+
+//                 if (!$updated || $affectedRows != 1) {
+
+//                     $db->rollback();
+
+//                     $this->Session->setFlash(
+//                         'No available quantity. This book cannot be issued.'
+//                     );
+
+//                 } else {
+
+//                     $this->BookIssue->create();
+
+//                     $issueData = array(
+//                         'BookIssue' => array(
+//                             'member_id' => (int)$memberId,
+//                             'book_id' => $bookId,
+//                             'issue_date' => $issueDate,
+//                             'due_date' => $dueDate,
+//                             'status' => 'Issued',
+//                             'fine' => 0
+//                         )
+//                     );
+
+//                     if ($this->BookIssue->save($issueData)) {
+
+//                         $db->commit();
+
+//                         $this->Session->setFlash(
+//                             'Book issued successfully. Due date: ' .
+//                             date('d-m-Y', strtotime($dueDate))
+//                         );
+
+//                         return $this->redirect(array(
+//                             'controller' => 'Books',
+//                             'action' => 'index'
+//                         ));
+
+//                     } else {
+
+//                         $db->rollback();
+
+//                         $this->Session->setFlash(
+//                             'Book issue failed. Quantity has not been changed.'
+//                         );
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+//     // Refresh book details so the form shows current stock.
+//     $book = $this->Book->find('first', array(
+//         'conditions' => array('Book.id' => $bookId),
+//         'recursive' => -1
+//     ));
+
+//     $members = $this->Member->find('list', array(
+//         'fields' => array('Member.id', 'Member.name'),
+//         'order' => array('Member.name' => 'ASC')
+//     ));
+
+//     $this->set(compact(
+//         'book',
+//         'members',
+//         'issueDate',
+//         'dueDate'
+//     ));
+// }
+
 public function issue($bookId = null)
 {
     $this->loadModel('Book');
@@ -740,9 +887,13 @@ public function issue($bookId = null)
 
     $bookId = (int)$bookId;
 
+    // Set valid default dates.
     $today = date('Y-m-d');
     $issueDate = $today;
-    $dueDate = date('Y-m-d', strtotime('+15 days', strtotime($today)));
+    $dueDate = date(
+        'Y-m-d',
+        strtotime('+15 days', strtotime($today))
+    );
 
     if ($this->request->is(array('post', 'put'))) {
 
@@ -760,89 +911,116 @@ public function issue($bookId = null)
             (int)$memberId <= 0 ||
             !$this->Member->exists((int)$memberId)
         ) {
-            $this->Session->setFlash('Please select a valid member.');
+            $this->Session->setFlash(
+                'Please select a valid member.'
+            );
         } else {
 
-            // Check current book quantity.
-            $book = $this->Book->find('first', array(
-                'conditions' => array('Book.id' => $bookId),
-                'fields' => array(
-                    'Book.id',
-                    'Book.title',
-                    'Book.quantity'
+            $memberId = (int)$memberId;
+
+            // Check whether this member already has this book issued.
+            $existingIssue = $this->BookIssue->find('first', array(
+                'conditions' => array(
+                    'BookIssue.member_id' => $memberId,
+                    'BookIssue.book_id' => $bookId,
+                    'BookIssue.status' => 'Issued'
                 ),
+                'fields' => array('BookIssue.id'),
                 'recursive' => -1
             ));
 
-            if (
-                empty($book) ||
-                (int)$book['Book']['quantity'] <= 0
-            ) {
+            if (!empty($existingIssue)) {
+
                 $this->Session->setFlash(
-                    'This book is out of stock and cannot be issued.'
+                    'This member has already issued this book. '
                 );
+
             } else {
 
-                $db = $this->Book->getDataSource();
-                $db->begin();
-
-                // Decrease stock by exactly one, only if stock remains.
-                $updated = $this->Book->updateAll(
-                    array(
-                        'Book.quantity' => 'Book.quantity - 1'
+                // Check current book quantity.
+                $book = $this->Book->find('first', array(
+                    'conditions' => array(
+                        'Book.id' => $bookId
                     ),
-                    array(
-                        'Book.id' => $bookId,
-                        'Book.quantity >' => 0
-                    )
-                );
+                    'fields' => array(
+                        'Book.id',
+                        'Book.title',
+                        'Book.quantity'
+                    ),
+                    'recursive' => -1
+                ));
 
-                $affectedRows = $db->lastAffected();
-
-                if (!$updated || $affectedRows != 1) {
-
-                    $db->rollback();
-
+                if (
+                    empty($book) ||
+                    (int)$book['Book']['quantity'] <= 0
+                ) {
                     $this->Session->setFlash(
-                        'No available quantity. This book cannot be issued.'
+                        'This book is out of stock and cannot be issued.'
                     );
-
                 } else {
 
-                    $this->BookIssue->create();
+                    $db = $this->Book->getDataSource();
+                    $db->begin();
 
-                    $issueData = array(
-                        'BookIssue' => array(
-                            'member_id' => (int)$memberId,
-                            'book_id' => $bookId,
-                            'issue_date' => $issueDate,
-                            'due_date' => $dueDate,
-                            'status' => 'Issued',
-                            'fine' => 0
+                    // Decrease stock by exactly one, only if stock remains.
+                    $updated = $this->Book->updateAll(
+                        array(
+                            'Book.quantity' => 'Book.quantity - 1'
+                        ),
+                        array(
+                            'Book.id' => $bookId,
+                            'Book.quantity >' => 0
                         )
                     );
 
-                    if ($this->BookIssue->save($issueData)) {
+                    $affectedRows = $db->lastAffected();
 
-                        $db->commit();
-
-                        $this->Session->setFlash(
-                            'Book issued successfully. Due date: ' .
-                            date('d-m-Y', strtotime($dueDate))
-                        );
-
-                        return $this->redirect(array(
-                            'controller' => 'Books',
-                            'action' => 'index'
-                        ));
-
-                    } else {
+                    if (!$updated || $affectedRows != 1) {
 
                         $db->rollback();
 
                         $this->Session->setFlash(
-                            'Book issue failed. Quantity has not been changed.'
+                            'No available quantity. This book cannot be issued.'
                         );
+
+                    } else {
+
+                        $this->BookIssue->create();
+
+                        $issueData = array(
+                            'BookIssue' => array(
+                                'member_id' => $memberId,
+                                'book_id' => $bookId,
+                                'issue_date' => $issueDate,
+                                'due_date' => $dueDate,
+                                'return_date' => null,
+                                'status' => 'Issued',
+                                'fine' => 0
+                            )
+                        );
+
+                        if ($this->BookIssue->save($issueData)) {
+
+                            $db->commit();
+
+                            $this->Session->setFlash(
+                                'Book issued successfully. Due date: ' .
+                                date('d-m-Y', strtotime($dueDate))
+                            );
+
+                            return $this->redirect(array(
+                                'controller' => 'Books',
+                                'action' => 'index'
+                            ));
+
+                        } else {
+
+                            $db->rollback();
+
+                            $this->Session->setFlash(
+                                'Book issue failed. Quantity has not been changed.'
+                            );
+                        }
                     }
                 }
             }
@@ -851,15 +1029,24 @@ public function issue($bookId = null)
 
     // Refresh book details so the form shows current stock.
     $book = $this->Book->find('first', array(
-        'conditions' => array('Book.id' => $bookId),
+        'conditions' => array(
+            'Book.id' => $bookId
+        ),
         'recursive' => -1
     ));
 
+    // Get members for the selection list.
     $members = $this->Member->find('list', array(
-        'fields' => array('Member.id', 'Member.name'),
-        'order' => array('Member.name' => 'ASC')
+        'fields' => array(
+            'Member.id',
+            'Member.name'
+        ),
+        'order' => array(
+            'Member.name' => 'ASC'
+        )
     ));
 
+    // Pass valid date values to the view.
     $this->set(compact(
         'book',
         'members',
@@ -867,6 +1054,7 @@ public function issue($bookId = null)
         'dueDate'
     ));
 }
+
 
 
 

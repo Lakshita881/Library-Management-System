@@ -363,85 +363,113 @@ public function register()
             // }
 
 
-        public function issuedBooks($memberId = null)
-        {
-            $loggedInId = $this->Auth->user('id');
-            $role = $this->Auth->user('role');
+public function issuedBooks($memberId = null)
+{
+    // Get logged-in user's information
+    $loggedInId = $this->Auth->user('id');
+    $role = $this->Auth->user('role');
 
-            if (!$loggedInId) {
-                return $this->redirect(array(
-                    'controller' => 'members',
-                    'action' => 'login'
-                ));
-            }
+    // Check login
+    if (!$loggedInId) {
+        return $this->redirect(array(
+            'controller' => 'members',
+            'action' => 'login'
+        ));
+    }
 
-            // A librarian may view any member's issued books.
-            // A regular member may view only their own books.
-            if ($memberId !== null) {
-                if ($role !== 'librarian') {
-                    throw new ForbiddenException(
-                        'Only librarians can view another member\'s issued books.'
-                    );
-                }
+    // If a member ID is provided, only librarians can view it.
+    if ($memberId !== null) {
 
-                if (
-                    !ctype_digit((string)$memberId) ||
-                    (int)$memberId <= 0 ||
-                    !$this->Member->exists((int)$memberId)
-                ) {
-                    throw new NotFoundException('Member not found.');
-                }
-
-                $memberId = (int)$memberId;
-            } else {
-                $memberId = (int)$loggedInId;
-            }
-
-            $this->loadModel('Book');
-
-            $member = $this->Member->find('first', array(
-                'conditions' => array('Member.id' => $memberId),
-                'recursive' => -1
-            ));
-
-            // Get only books that have not yet been returned.
-            // $issues = $this->BookIssue->find('all', array(
-            //     'conditions' => array(
-            //         'BookIssue.member_id' => $memberId,
-            //         'BookIssue.status' => 'Issued'
-            //     ),
-            //     'order' => array('BookIssue.due_date' => 'ASC'),
-            //     'recursive' => -1
-            // ));
-
-            //Displaying the history of all the books that were issued by the user/member
-            $issues = $this->BookIssue->find('all', array(
-                'conditions' => array(
-                    'BookIssue.member_id' => $memberId
-                ),
-                'order' => array('BookIssue.id' => 'DESC'),
-                'recursive' => -1
-            ));
-
-
-            // Fetch book details without relying on model associations.
-            foreach ($issues as $key => $issue) {
-                $book = $this->Book->find('first', array(
-                    'conditions' => array(
-                        'Book.id' => $issue['BookIssue']['book_id']
-                    ),
-                    'fields' => array('Book.id', 'Book.title'),
-                    'recursive' => -1
-                ));
-
-                $issues[$key]['Book'] = !empty($book)
-                    ? $book['Book']
-                    : array('title' => 'Book not found');
-            }
-
-            $this->set(compact('member', 'issues', 'memberId'));
-            $this->set('isLibrarian', $role === 'librarian');
+        if ($role !== 'librarian') {
+            throw new ForbiddenException(
+                'Only librarians can view another member\'s issued books.'
+            );
         }
+
+        // Validate member ID
+        if (
+            !ctype_digit((string)$memberId) ||
+            (int)$memberId <= 0
+        ) {
+            throw new NotFoundException('Invalid member ID.');
+        }
+
+        $memberId = (int)$memberId;
+
+        if (!$this->Member->exists($memberId)) {
+            throw new NotFoundException('Member not found.');
+        }
+
+    } else {
+        // Regular members see their own issue history.
+        $memberId = (int)$loggedInId;
+    }
+
+    // Load Book model
+    $this->loadModel('Book');
+
+    // Get member details
+    $member = $this->Member->find('first', array(
+        'conditions' => array(
+            'Member.id' => $memberId
+        ),
+        'recursive' => -1
+    ));
+
+    if (empty($member)) {
+        throw new NotFoundException('Member not found.');
+    }
+
+    // Get all issue history for this member
+    $issues = $this->BookIssue->find('all', array(
+        'conditions' => array(
+            'BookIssue.member_id' => $memberId
+        ),
+        'order' => array(
+            'BookIssue.id' => 'DESC'
+        ),
+        'recursive' => -1
+    ));
+
+    // Fetch book titles
+    foreach ($issues as $key => $issue) {
+
+        $bookId = $issue['BookIssue']['book_id'];
+
+        $book = $this->Book->find('first', array(
+            'conditions' => array(
+                'Book.id' => $bookId
+            ),
+            'fields' => array(
+                'Book.id',
+                'Book.title'
+            ),
+            'recursive' => -1
+        ));
+
+        if (!empty($book)) {
+            $issues[$key]['Book'] = $book['Book'];
+        } else {
+            $issues[$key]['Book'] = array(
+                'id' => $bookId,
+                'title' => 'Book not found'
+            );
+        }
+    }
+
+    // Pass data to the view
+    $this->set(compact(
+        'member',
+        'issues',
+        'memberId'
+    ));
+
+    $this->set(
+        'isLibrarian',
+        ($role === 'librarian')
+    );
+}
+
 
 
 
